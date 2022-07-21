@@ -49,7 +49,15 @@ The variable dbx must be populated with a signature list that contains the follo
 - ImageCert9
 - EFI\_CERT\_SHA256\_GUID(TestImage10)
 
-The test infrastructure must transition the firmware to User Mode with SecureBoot=1 to run these test cases.
+The test infrastructure must transition the firmware to User Mode with SecureBoot=1 to run these test cases.  This must be done with the follwing steps:
+- Verify SetupMode=1
+- Use SetVariable() to initialize PK,KEK,db,dbx to test certificates
+- Verify SetupMode=0
+- Reboot the system
+- Verify SetupMode=0, SecureBoot=1 (User Mode)
+
+After the tests are complete the test infrastructure must
+- Clear PK to return to Setup Mode, clear KEK,db,dbx
 
 | **Number** | **GUID** | **Assertion** | **Test Description** |
 | --- | --- | --- | --- |
@@ -122,7 +130,15 @@ This test assumes the system is in SetupMode.
 
 ### 4.5.2 VariableUpdates()
 
-The test infrastructure must transition the firmware to User Mode with SecureBoot=1 to run these test cases.
+The test infrastructure must transition the firmware to User Mode with SecureBoot=1 to run these test cases.  This must be done with the follwing steps:
+- Verify SetupMode=1
+- Use SetVariable() to initialize PK,KEK,db,dbx to test certificates
+- Verify SetupMode=0
+- Reboot the system
+- Verify SetupMode=0, SecureBoot=1 (User Mode)
+
+After the tests are complete the test infrastructure must
+- Clear PK to return to Setup Mode, clear KEK,db,dbx
 
 | **Number** | **GUID** | **Assertion** | **Test Description** |
 | --- | --- | --- | --- |
