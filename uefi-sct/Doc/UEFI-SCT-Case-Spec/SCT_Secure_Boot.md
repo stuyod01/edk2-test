@@ -130,26 +130,26 @@ This test assumes the system is in SetupMode.
 
 ### 4.5.2 VariableUpdates()
 
-The test infrastructure must transition the firmware to User Mode with SecureBoot=1 to run these test cases.  This must be done with the follwing steps:
+The test infrastructure must transition the firmware to User Mode (with PK enrolled):
 - Verify SetupMode=1
-- Use SetVariable() to initialize PK,KEK,db,dbx to test certificates
+- Use SetVariable() to initialize PK to a test certificate
 - Verify SetupMode=0
-- Reboot the system
-- Verify SetupMode=0, SecureBoot=1 (User Mode)
 
 After the tests are complete the test infrastructure must
 - Clear PK to return to Setup Mode, clear KEK,db,dbx
 
 | **Number** | **GUID** | **Assertion** | **Test Description** |
 | --- | --- | --- | --- |
-| 4.5.2.1 | 0xd2073163, 0xedb0, 0x4d6b, 0xba, 0x8f, 0x5c, 0x61, 0x16, 0xc1, 0x59, 0x2c | **SecureBoot** - Verify update of KEK with unsigned data. | Invoke SetVariable to set KEK to an unsigned data blob.<ol type="a"><li>Verify that function returns EFI\_SECURITY\_VIOLATION.</ol> |
-| 4.5.2.2 | 0xbee3bc26, 0xda93, 0x455b, 0xa2, 0x39, 0xe6, 0x56, 0x82, 0x4f, 0xee, 0xec | **SecureBoot** - Verify update of KEK is authorized by PK. | Invoke SetVariable to set KEK to signature list authorized by PK.<ol type="a"><li>Verify that function returns EFI\_SUCCESS.</ol>|
-| 4.5.2.3 | 0x25ad4f9b, 0x6533, 0x4a96, 0x94, 0x47, 0xfe, 0xed, 0x03, 0xee, 0xc3, 0xe2 | **SecureBoot** - Verify update of db with unsigned data. | Invoke SetVariable to set db to an unsigned data blob.<ol type="a"><li>Verify that function returns EFI\_SECURITY\_VIOLATION.</ol>|
-| 4.5.2.4 | 0x2f1014eb, 0x4e84, 0x4293, 0xba, 0xd3, 0x53, 0x03, 0x5f, 0x9e, 0xae, 0xb4 | **SecureBoot** - Verify update of db authorized by PK. | Invoke SetVariable to set db to signature list authorized by PK.<ol type="a"><li>Verify that function returns EFI\_SUCCESS.</ol>|
-| 4.5.2.5 | 0x021ef001, 0x0cb2, 0x45d4, 0x85, 0x29, 0xd4, 0xf0, 0xe8, 0x3a, 0xdd, 0x1f | **SecureBoot** - Verify update of db authorized by KEK. | Invoke SetVariable to set db to signature list authorized by KEK.<ol type="a"><li>Verify that function returns EFI\_SUCCESS.</ol> |
-| 4.5.2.6 | 0x70febf5b, 0x27d6, 0x44ae, 0xab, 0x43, 0x05, 0x9d, 0xdd, 0x8b, 0x29, 0x47 | **SecureBoot** - Verify update of dbx with unsigned data. | Invoke SetVariable to set dbx to an unsigned data blob.<ol type="a"><li>Verify that function returns EFI\_SECURITY\_VIOLATION.</ol>|
-| 4.5.2.7 | 0xefe0e633, 0xfd4c, 0x4b20, 0xa6, 0x4d, 0xed, 0x4f, 0x2a, 0xfb, 0xa5, 0xce | **SecureBoot** - Verify update of dbx authorized by KEK. | Invoke SetVariable to set dbx to signature list authorized by KEK.<ol type="a"><li>Verify that function returns EFI\_SUCCESS.</ol>|
-| 4.5.2.8 | 0xead975e5, 0x0a13, 0x45a6, 0xac, 0xdd, 0xb3, 0xee, 0x23, 0x64, 0x30, 0x57 | **SecureBoot** - Verify update of db wth data authorized by second signature in KEK signature list. | Invoke SetVariable to set db to signature list authorized by second signature in KEK siglist.<ol type="a"><li>Verify that function returns EFI\_SUCCESS.</ol> |
-| 4.5.2.9 | 0x6f4fe39c, 0xdaa0, 0x4a4e, 0xbf, 0x44, 0xca, 0xfb, 0x05, 0x37, 0x2b, 0x53 | **SecureBoot** - Verify append to KEK with data authorized by PK. | Invoke SetVariable to append signature list to KEK.<ol type="a"><li>Verify that function returns EFI\_SUCCESS.</ol>|
-| 4.5.2.10 | 0x63ba72d3, 0x9089, 0xac63, 0xf0, 0x89, 0xad, 0x90, 0x24, 0x67, 0xdb, 0xd3 | **SecureBoot** - Verify append to db with data authorized by signature appended to KEK in 4.5.2.9. | Invoke SetVariable to append a db signature list authorized by the signature appended to KEK in 4.5.2.9.<ol type="a"><li>Verify that function returns EFI\_SUCCESS.</ol>|
-
+| 4.5.2.1 | 0x68054c5f, 0x011e, 0x42c5, 0x9f, 0x9d, 0x23, 0xc4, 0xba, 0x0e, 0x37, 0x42 | **SecureBoot** - Verify create operation on secure boot variables, authorized by PK. | For each variable (KEK,db,dbx), use SetVariable to set to data (authorized by PK)<ol type="a"><li>Verify that function returns EFI\_SUCCESS.</ol> |
+| 4.5.2.2 | 0x743ca7ad, 0x8dc3, 0x4d29, 0x80, 0xed, 0xd2, 0x69, 0xcc, 0x9b, 0x1d, 0x8d | **SecureBoot** - Verify the attributes for PK and KEK are as defined by 3.3 Globally Defined Variables in the UEFI spec. | For each variable (PK,KEK), use GetVariable to get the variable attributes<ol type="a"><li>Verify the variable attributes for PK/KEK.  Attributes should be NV,BS,RT,AT.</ol> |
+| 4.5.2.3 | 0x3dd97680, 0xfd18, 0x4b33, 0xaa, 0x9c, 0xdb, 0xf0, 0x81, 0x60, 0xfb, 0x57 | **SecureBoot** - Verify delete operation on secure boot variables, authorized by PK. | For each variable (KEK,db,dbx), use SetVariable to set to null (authorized by PK)<ol type="a"><li>Verify that function returns EFI\_SUCCESS.<li>Verify that GetVariable() returns EFI\_NOT\_FOUND.</ol> |
+| 4.5.2.4 | 0xf6778756, 0xf6f8, 0x42fe, 0x8e, 0x66, 0x0c, 0x28, 0x95, 0x71, 0x77, 0x45 | **SecureBoot** - Verify delete operation on secure boot variables with mismatched attributes. | For each variable (KEK,db,dbx), use SetVariable to set to null (authorized by PK), but with attributes that don't match existing ones.<ol type="a"><li>Verify that function returns EFI\_INVALID\_PARAMETER.</ol> |
+| 4.5.2.5 | 0x97bc750e, 0x84c9, 0x4416, 0x9e, 0x27, 0x49, 0xc8, 0x66, 0x2c, 0xef, 0xb6 | **SecureBoot** - Verify signed update of secure boot variables with unauthorized signer. | For each variable (KEK,db,dbx), use SetVariable to set to data<ol type="a"><li>Verify that function returns EFI\_SECURITY\_VIOLATION.</ol> |
+| 4.5.2.6 | 0xe280f1b0, 0x0d4c, 0x42d4, 0x9a, 0xc3, 0xa1, 0xff, 0xc6, 0xaa, 0xba, 0xba | **SecureBoot** - Test update of secure boot variables with unsigned data. | For each variable (KEK,db,dbx), use SetVariable with unsigned data.<ol type="a"><li>Verify that function returns EFI\_SECURITY\_VIOLATION.</ol> |
+| 4.5.2.7 | 0x6c63399e, 0xf8ab, 0x4257, 0xa0, 0x6e, 0x69, 0x10, 0x92, 0xaf, 0x69, 0x94 | **SecureBoot** - Test update of secure boot variables with non-zero Pad1, Nanosecond, TimeZone, Daylight and Pad2 fields in the timestamp. | For db use SetVariable with signed data with non-zero Pad1, Nanosecond, TimeZone, Daylight and Pad2 fields in the timestamp.<ol type="a"><li>Verify that function returns EFI\_SECURITY\_VIOLATION.</ol> |
+| 4.5.2.8 | 0x1cb15937, 0x3916, 0x4dac, 0x87, 0xc4, 0x26, 0xd2, 0xc8, 0xa4, 0x4b, 0x65 | **SecureBoot** - Test update of secure boot variables that already exist with data authorized by PK. | For each variable (KEK,db,dbx), use SetVariable with data authorized by PK.<ol type="a"><li>Verify that function returns EFI\_SUCCESS.</ol> |
+| 4.5.2.9 | 0xcc1d50fa, 0xa46c, 0x4a61, 0x8a, 0x98, 0x5e, 0x25, 0xb5, 0x2b, 0x72, 0x05 | **SecureBoot** - Test update of db,dbx with data authorized by KEK. | For each variable (db,dbx), use SetVariable with data authorized by KEK.<ol type="a"><li>Verify that function returns EFI\_SUCCESS.</ol> |
+| 4.5.2.10 | 0x00158dd8, 0xcfca, 0x42fc, 0x85, 0x19, 0xa9, 0x20, 0x4e, 0x19, 0x36, 0x3c | **SecureBoot** - Verify update of db,dbx wth data authorized by second signature in KEK signature list. | Invoke SetVariable to set db to signature list authorized by second signature in KEK signature list.<ol type="a"><li>Verify that function returns EFI\_SUCCESS.</ol> |
+| 4.5.2.11 | 0xab969f35, 0xfe3e, 0x4408, 0xad, 0xd8, 0xe0, 0xe3, 0xe4, 0x83, 0x2c, 0x74 | **SecureBoot** - Verify append to KEK with data authorized by PK. | Invoke SetVariable to append signature list to KEK.<ol type="a"><li>Verify that function returns EFI\_SUCCESS.</ol>|
+| 4.5.2.12 | 0x16f5a492, 0x3946, 0x4514, 0xba, 0xe5, 0x0b, 0xa1, 0xf0, 0x83, 0xcb, 0xcc | **SecureBoot** - Verify append to db,dbx with data authorized by signature appended to KEK in 4.5.2.9. | Invoke SetVariable to append a db,dbx signature list authorized by the signature appended to KEK in 4.5.2.9.<ol type="a"><li>Verify that function returns EFI\_SUCCESS.</ol>|
+| 4.5.2.13 | 0x0729b175, 0x5975, 0x4849, 0xab, 0x50, 0x92, 0x85, 0xf1, 0xef, 0xcf, 0x61 | **SecureBoot** - Attempt to perform unsigned delete on secure boot variables. | For each variable (PK,KEK,db,dbx), use SetVariable with unsigned null data to do a delete.<ol type="a"><li>Verify that function returns EFI\_SECURITY\_VIOLATION.</ol> |
